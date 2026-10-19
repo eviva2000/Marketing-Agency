@@ -1,0 +1,13 @@
+[project]
+name = "agency"
+version = "0.1.0"
+description = "Agentic marketing agency built on the OpenAI Agents SDK"
+requires-python = ">=3.10"
+dependencies = [
+    "openai-agents>=0.0.19",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
