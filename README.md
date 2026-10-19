@@ -39,6 +39,14 @@ it hand off and print the structured `OfferPackage` JSON.
 - `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, handoff target
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
 
+## Architecture decisions
+
+Significant design choices and their alternatives are recorded in [docs/decisions](docs/decisions):
+
+- [ADR-001](docs/decisions/ADR-001-openai-agents-sdk.md) — why the OpenAI Agents SDK over LangChain/CrewAI/raw API
+- [ADR-002](docs/decisions/ADR-002-handoff-for-structured-output.md) — why a handoff produces the structured output, not the main agent
+- [ADR-003](docs/decisions/ADR-003-v1-scope.md) — why v1 is one agent pair, CLI-only, with mocked tools
+
 ## Next steps (not built yet)
 
 - Real tools (web search, CRM, email) instead of mocks
