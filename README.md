@@ -1,5 +1,7 @@
 # Agentic Marketing Agency (Learning Project)
 
+[![CI](https://github.com/eviva2000/Marketing-Agency/actions/workflows/ci.yml/badge.svg)](https://github.com/eviva2000/Marketing-Agency/actions/workflows/ci.yml)
+
 A small Offer Creation Bot built on the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/),
 used as a hands-on introduction to tool calling, structured outputs, and multi-agent handoffs.
 
@@ -19,6 +21,14 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
 cp .env.example .env   # then add your real OPENAI_API_KEY
+```
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+python -m pytest     # run tests (no OPENAI_API_KEY needed — agent tests use a fake Model)
+ruff check .          # lint
 ```
 
 ## Run
