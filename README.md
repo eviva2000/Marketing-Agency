@@ -48,6 +48,9 @@ it hand off and print the structured `OfferPackage` JSON.
 - `src/agency/agents/offer_agent.py` — conversational agent with tools + handoff
 - `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, handoff target
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
+- `context/` — planning/context docs: project overview, coding standards, how an agent should
+  operate in this repo, and the current/completed feature log (start at
+  [context/project-overview.md](context/project-overview.md))
 
 ## Architecture decisions
 
