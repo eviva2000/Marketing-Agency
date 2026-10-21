@@ -89,8 +89,10 @@ in ADR-003. Flag to the user if there's a reason to keep a no-API-key demo path.
 - [x] `ruff check .` passes with zero errors
 - [x] `python3 -m pytest` passes with zero real API/network calls
 - [x] `offer_agent` uses `WebSearchTool` instead of the mocked niche/benchmark tools
-- [ ] Manual smoke test with a real `OPENAI_API_KEY` against an industry not in the old hardcoded
-      list produces a grounded recommendation (not run as part of this change — do before relying
-      on this in a live demo)
+- [x] Manual smoke test with a real `OPENAI_API_KEY` against an industry not in the old hardcoded
+      list produces a grounded recommendation — ran `python -m agency.cli` with "pet grooming"
+      (not one of roofing/HVAC/foundation); got a cited, web-grounded niche recommendation (mobile
+      dog groomers, with real pricing sources), confirmed it, and the handoff to Offer Summarizer
+      produced a valid structured `OfferPackage`.
 - [x] README and ADR-003 updated to reflect real web-search grounding
 - [x] `context/current-feature.md` updated: this entry moved to "Completed features"
