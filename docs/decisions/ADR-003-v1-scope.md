@@ -54,9 +54,14 @@ Scope the first build to:
 Per [docs/intent/full-pipeline-showcase.md](../intent/full-pipeline-showcase.md), this project's
 goal shifted from a pure learning repo to a resume-ready showcase, and real-world grounding via web
 search (`WebSearchTool`) was decided for the Offer stage specifically, superseding the "mocked
-tools" part of this ADR's decision for that stage. `src/agency/tools.py` still uses the mocked
-`list_candidate_niches`/`get_niche_benchmarks` functions as of this writing — switching them to
-`WebSearchTool` is tracked as follow-up implementation work, not yet done.
+tools" part of this ADR's decision for that stage.
+
+## Update (2026-10-21)
+`offer_agent` now uses `agents.WebSearchTool` instead of the mocked `list_candidate_niches`/
+`get_niche_benchmarks` functions (`src/agency/tools.py` removed) — see
+[context/features/web-search-grounding.md](../../context/features/web-search-grounding.md). The
+Offer stage now requires a real `OPENAI_API_KEY` for any run; there is no API-key-free mock mode
+for it anymore.
 
 The rest of this ADR's scope still holds as the current state: one agent pair, CLI interface, and
 Lead Gen/Outbound/Qualify/Sales not yet built (now tracked concretely in

@@ -3,7 +3,7 @@
 import dataclasses
 import json
 
-from agents import Runner
+from agents import Runner, WebSearchTool
 from agents.items import HandoffOutputItem
 
 from agency.agents.offer_agent import offer_agent
@@ -33,7 +33,11 @@ def _minimal_offer_package_json() -> str:
     )
 
 
-def test_offer_agent_uses_tools_then_hands_off(fake_model):
+def test_offer_agent_has_web_search_tool():
+    assert any(isinstance(tool, WebSearchTool) for tool in offer_agent.tools)
+
+
+def test_offer_agent_hands_off_once_confirmed(fake_model):
     summarizer = dataclasses.replace(
         offer_summarizer_agent,
         model=fake_model([[text_message(_minimal_offer_package_json())]]),
@@ -41,13 +45,7 @@ def test_offer_agent_uses_tools_then_hands_off(fake_model):
     agent = dataclasses.replace(
         offer_agent,
         handoffs=[summarizer],
-        model=fake_model(
-            [
-                [tool_call("list_candidate_niches", '{"industry": "home services"}', call_id="call_1")],
-                [tool_call("get_niche_benchmarks", '{"niche": "Roofing"}', call_id="call_2")],
-                [tool_call(handoff_tool_name(summarizer), "{}", call_id="call_3")],
-            ]
-        ),
+        model=fake_model([[tool_call(handoff_tool_name(summarizer), "{}", call_id="call_1")]]),
     )
 
     result = Runner.run_sync(agent, "I run a home services agency, recommend a niche")

@@ -26,4 +26,7 @@ written yet.
 - [Observability](features/observability.md) — SDK tracing wired into the CLI (`RunConfig`
   workflow name/group id) with a console-export fallback for API-key-free local runs, covered by
   tests using an in-memory `TracingProcessor` (Completed).
+- [Web Search Grounding](features/web-search-grounding.md) — replaced the Offer stage's mocked
+  `list_candidate_niches`/`get_niche_benchmarks` tools with the Agents SDK's `WebSearchTool`;
+  Offer stage now requires a real `OPENAI_API_KEY` for any run (Completed).
 
