@@ -1,14 +1,14 @@
-# Current Feature: None (next: Observability)
+# Current Feature: None (next: Lead Gen)
 
 ## Active Spec
 
 None in progress. Next up per the build order in
-[context/project-overview.md](project-overview.md): **observability** (SDK tracing/observability
-setup) — no spec written yet.
+[context/project-overview.md](project-overview.md): **lead-gen** (Lead Gen agent) — no spec
+written yet.
 
 ## Goals
 
-- (none yet — filled in once the observability spec is written)
+- (none yet — filled in once the lead-gen spec is written)
 
 ## Notes
 
@@ -23,4 +23,7 @@ setup) — no spec written yet.
   and [ADR-003](../docs/decisions/ADR-003-v1-scope.md) (Completed).
 - [Testing & CI](features/testing-ci.md) — `pytest` + `ruff` + GitHub Actions CI added, covering
   the Offer stage with zero real API calls (Completed).
+- [Observability](features/observability.md) — SDK tracing wired into the CLI (`RunConfig`
+  workflow name/group id) with a console-export fallback for API-key-free local runs, covered by
+  tests using an in-memory `TracingProcessor` (Completed).
 

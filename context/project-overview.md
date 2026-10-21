@@ -41,7 +41,7 @@ Built incrementally, one module at a time, to keep each hands-on learning step i
 | Module id | Responsibility | Depends on | Status |
 |---|---|---|---|
 | testing-ci | Test framework + CI pipeline (applies to the existing Offer stage too) | — | Completed |
-| observability | SDK tracing/observability setup | — | Not started |
+| observability | SDK tracing/observability setup | — | Completed |
 | lead-gen | Lead Gen agent: finds/qualifies candidate leads via web search, hands off from Offer | testing-ci, observability | Not started |
 | outbound | Outbound agent: generates dry-run emails/call scripts/sequences (never dispatched), hands off from Lead Gen | lead-gen | Not started |
 | web-ui | Local web chat UI running the full Offer→Lead Gen→Outbound session (replaces/wraps the CLI) | lead-gen, outbound | Not started |

@@ -7,9 +7,13 @@ from agents.items import HandoffOutputItem, ToolCallItem, ToolCallOutputItem
 from dotenv import load_dotenv
 
 from agency.agents.offer_agent import offer_agent
+from agency.observability import configure_tracing, run_config
 from agency.schemas import OfferPackage
 
 load_dotenv()
+configure_tracing()
+
+SESSION_ID = "offer-bot-cli"
 
 
 def _print_trace_items(new_items: list) -> None:
@@ -33,7 +37,7 @@ def _print_final_output(final_output) -> None:
 
 
 def main() -> None:
-    session = SQLiteSession(session_id="offer-bot-cli")
+    session = SQLiteSession(session_id=SESSION_ID)
     current_agent = offer_agent
 
     print("Offer Creation Bot (type 'exit' to quit)\n")
@@ -44,7 +48,12 @@ def main() -> None:
         if not user_input:
             continue
 
-        result = Runner.run_sync(current_agent, user_input, session=session)
+        result = Runner.run_sync(
+            current_agent,
+            user_input,
+            session=session,
+            run_config=run_config("Offer Stage", SESSION_ID),
+        )
         current_agent = result.last_agent
 
         _print_trace_items(result.new_items)
