@@ -7,12 +7,14 @@ used as a hands-on introduction to tool calling, structured outputs, and multi-a
 
 ## What it does
 
-1. **Offer Creation Bot** (conversational) interviews you about your target industry, uses mock
-   research tools to compare candidate niches, and gives an opinionated recommendation.
+1. **Offer Creation Bot** (conversational) interviews you about your target industry, uses the
+   Agents SDK's `WebSearchTool` to research real candidate niches and benchmarks, and gives an
+   opinionated recommendation grounded in what it finds.
 2. Once you confirm a niche, it **hands off** to the **Offer Summarizer** agent, which reads the
    conversation and returns a structured `OfferPackage` (offer summary + ready-to-use pitch copy).
 
-All research data in `src/agency/tools.py` is mocked/hardcoded — no real web search or APIs yet.
+`WebSearchTool` is a hosted tool that requires a real `OPENAI_API_KEY` (OpenAI Responses API) —
+there is no API-key-free mock mode for the Offer stage anymore.
 
 ## Setup
 
@@ -30,6 +32,11 @@ pip install -e ".[dev]"
 python -m pytest     # run tests (no OPENAI_API_KEY needed — agent tests use a fake Model)
 ruff check .          # lint
 ```
+
+`WebSearchTool` is a hosted tool executed by OpenAI's backend, so it never runs under the fake
+`Model` used in tests — the automated suite only checks that `offer_agent` is wired with it, not
+actual search behavior. To see real search results, run the CLI by hand with a real
+`OPENAI_API_KEY` (see Run below).
 
 ## Run
 
@@ -58,8 +65,7 @@ AGENCY_TRACE_CONSOLE=1 python -m agency.cli
 ## Project layout
 
 - `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`)
-- `src/agency/tools.py` — mock `@function_tool` functions (niche lists, benchmarks)
-- `src/agency/agents/offer_agent.py` — conversational agent with tools + handoff
+- `src/agency/agents/offer_agent.py` — conversational agent with `WebSearchTool` + handoff
 - `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, handoff target
 - `src/agency/observability.py` — tracing setup (console export toggle, `RunConfig` tagging)
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
@@ -73,10 +79,9 @@ Significant design choices and their alternatives are recorded in [docs/decision
 
 - [ADR-001](docs/decisions/ADR-001-openai-agents-sdk.md) — why the OpenAI Agents SDK over LangChain/CrewAI/raw API
 - [ADR-002](docs/decisions/ADR-002-handoff-for-structured-output.md) — why a handoff produces the structured output, not the main agent
-- [ADR-003](docs/decisions/ADR-003-v1-scope.md) — why v1 is one agent pair, CLI-only, with mocked tools
+- [ADR-003](docs/decisions/ADR-003-v1-scope.md) — why v1 is one agent pair, CLI-only, with mocked tools (now superseded for the Offer stage's tools — see the ADR's Update note)
 
 ## Next steps (not built yet)
 
-- Real tools (web search, CRM, email) instead of mocks
 - Additional stage agents (Lead Gen, Outbound, Qualify, Sales)
 - Input guardrails and persisted sessions across separate CLI runs

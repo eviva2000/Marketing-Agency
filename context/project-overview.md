@@ -10,21 +10,21 @@ now being leveled up into a resume-ready showcase of agentic-systems engineering
 ## What it does today
 
 1. **Offer Creation Bot** (conversational) interviews the user about their target industry, uses
-   research tools to compare candidate niches, and gives an opinionated recommendation.
+   `WebSearchTool` to research real candidate niches and benchmarks, and gives an opinionated
+   recommendation grounded in what it finds.
 2. Once the user confirms a niche, it **hands off** to the **Offer Summarizer** agent, which reads
    the conversation and returns a structured `OfferPackage` (offer summary + ready-to-use pitch
    copy).
 3. Everything runs through a CLI chat loop (`python -m agency.cli`); no web UI yet.
 
-Research data in `src/agency/tools.py` is currently mocked — see the Update note in
-[ADR-003](../docs/decisions/ADR-003-v1-scope.md) for the plan to replace it with real
-`WebSearchTool` grounding for the Offer stage.
+`WebSearchTool` is a hosted tool (OpenAI Responses API) — the Offer stage requires a real
+`OPENAI_API_KEY` for any run, per the Update note in
+[ADR-003](../docs/decisions/ADR-003-v1-scope.md).
 
 ## Where things live
 
 - `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`)
-- `src/agency/tools.py` — `@function_tool` functions (niche lists, benchmarks)
-- `src/agency/agents/offer_agent.py` — conversational agent with tools + handoff
+- `src/agency/agents/offer_agent.py` — conversational agent with `WebSearchTool` + handoff
 - `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, handoff target
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
 - `tests/` — unit + agent-behavior tests (fake `Model`, zero real API calls)

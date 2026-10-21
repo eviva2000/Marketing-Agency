@@ -1,17 +1,14 @@
-# Current Feature: web-search-grounding
+# Current Feature: None (next: Lead Gen)
 
 ## Active Spec
 
-[web-search-grounding](features/web-search-grounding.md) — replace the Offer stage's mocked
-`list_candidate_niches`/`get_niche_benchmarks` tools with the Agents SDK's `WebSearchTool`, per the
-Update note in [ADR-003](../docs/decisions/ADR-003-v1-scope.md). **lead-gen** remains next up after
-this per the build order in [context/project-overview.md](project-overview.md).
+None in progress. Next up per the build order in
+[context/project-overview.md](project-overview.md): **lead-gen** (Lead Gen agent) — no spec
+written yet.
 
 ## Goals
 
-- `offer_agent` uses `WebSearchTool` for real web-grounded niche research instead of a hardcoded
-  mock dataset.
-- No real API/network calls added to the default `pytest`/CI suite.
+- (none yet — filled in once the lead-gen spec is written)
 
 ## Notes
 
@@ -29,4 +26,7 @@ this per the build order in [context/project-overview.md](project-overview.md).
 - [Observability](features/observability.md) — SDK tracing wired into the CLI (`RunConfig`
   workflow name/group id) with a console-export fallback for API-key-free local runs, covered by
   tests using an in-memory `TracingProcessor` (Completed).
+- [Web Search Grounding](features/web-search-grounding.md) — replaced the Offer stage's mocked
+  `list_candidate_niches`/`get_niche_benchmarks` tools with the Agents SDK's `WebSearchTool`;
+  Offer stage now requires a real `OPENAI_API_KEY` for any run (Completed).
 

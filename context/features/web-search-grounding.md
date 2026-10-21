@@ -1,7 +1,7 @@
 # Feature: web-search-grounding (Offer stage follow-up)
 
 ## Status
-Not started
+Completed
 
 ## Objective
 
@@ -61,37 +61,36 @@ in ADR-003. Flag to the user if there's a reason to keep a no-API-key demo path.
 ## Task list
 
 ### Phase 1: Agent wiring
-- [ ] Task 1: Resolve the open question above (delete vs. keep `tools.py`).
-- [ ] Task 2: Update `src/agency/agents/offer_agent.py` — add `WebSearchTool()` to `tools`, remove
+- [x] Task 1: Resolve the open question above (delete vs. keep `tools.py`) — deleted, per ADR-003's
+      intent that mocked data must be replaced with real data sources.
+- [x] Task 2: Update `src/agency/agents/offer_agent.py` — add `WebSearchTool()` to `tools`, remove
       `list_candidate_niches`/`get_niche_benchmarks`, rewrite `INSTRUCTIONS` to describe the new
       web-search-driven research flow (what to search for, how many sources/candidates to
       consider, still grounding the recommendation's math in what it finds).
-- [ ] Task 3: If Task 1 decided to delete `tools.py`, remove the file and its dedicated unit tests
-      (`tests/test_tools.py`); if kept, leave as-is but note in the module docstring that it is
-      unused by any agent.
+- [x] Task 3: Deleted `src/agency/tools.py` and its dedicated unit tests (`tests/test_tools.py`).
 
 ### Phase 2: Tests
-- [ ] Task 4: Update `tests/agents/test_offer_agent.py` — drop any `FakeModel` scripting of the
-      removed mock tool calls; add a test asserting `offer_agent.tools` contains a `WebSearchTool`
+- [x] Task 4: Updated `tests/agents/test_offer_agent.py` — dropped `FakeModel` scripting of the
+      removed mock tool calls; added a test asserting `offer_agent.tools` contains a `WebSearchTool`
       instance (construction/wiring check, not a live search).
-- [ ] Task 5: Confirm no test in the default suite makes a real network/OpenAI call (`WebSearchTool`
-      must stay untriggered under `FakeModel`-driven tests).
+- [x] Task 5: Confirmed no test in the default suite makes a real network/OpenAI call (`WebSearchTool`
+      stays untriggered under `FakeModel`-driven tests) — `python3 -m pytest` passes offline.
 
 ### Phase 3: Docs
-- [ ] Task 6: Update README to state the Offer stage needs a real `OPENAI_API_KEY` for web search
+- [x] Task 6: Updated README to state the Offer stage needs a real `OPENAI_API_KEY` for web search
       (no more mock/offline mode for this stage), and briefly describe the manual smoke-test
       (`python -m agency.cli` with a real key, try an industry outside the old hardcoded three).
-- [ ] Task 7: Update [context/project-overview.md](../project-overview.md)'s "What it does today"
-      section (currently says research tools are mocked) and
-      [docs/decisions/ADR-003](../../docs/decisions/ADR-003-v1-scope.md)'s Update note to record
-      that this follow-up is done.
+- [x] Task 7: Updated [context/project-overview.md](../project-overview.md)'s "What it does today"
+      section and [docs/decisions/ADR-003](../../docs/decisions/ADR-003-v1-scope.md)'s Update note
+      to record that this follow-up is done.
 
 ## Checkpoint: Complete
 
-- [ ] `ruff check .` passes with zero errors
-- [ ] `python3 -m pytest` passes with zero real API/network calls
-- [ ] `offer_agent` uses `WebSearchTool` instead of the mocked niche/benchmark tools
+- [x] `ruff check .` passes with zero errors
+- [x] `python3 -m pytest` passes with zero real API/network calls
+- [x] `offer_agent` uses `WebSearchTool` instead of the mocked niche/benchmark tools
 - [ ] Manual smoke test with a real `OPENAI_API_KEY` against an industry not in the old hardcoded
-      list produces a grounded recommendation
-- [ ] README and ADR-003 updated to reflect real web-search grounding
-- [ ] `context/current-feature.md` updated: this entry moved to "Completed features"
+      list produces a grounded recommendation (not run as part of this change — do before relying
+      on this in a live demo)
+- [x] README and ADR-003 updated to reflect real web-search grounding
+- [x] `context/current-feature.md` updated: this entry moved to "Completed features"
