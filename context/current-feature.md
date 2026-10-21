@@ -1,14 +1,17 @@
-# Current Feature: None (next: Lead Gen)
+# Current Feature: web-search-grounding
 
 ## Active Spec
 
-None in progress. Next up per the build order in
-[context/project-overview.md](project-overview.md): **lead-gen** (Lead Gen agent) — no spec
-written yet.
+[web-search-grounding](features/web-search-grounding.md) — replace the Offer stage's mocked
+`list_candidate_niches`/`get_niche_benchmarks` tools with the Agents SDK's `WebSearchTool`, per the
+Update note in [ADR-003](../docs/decisions/ADR-003-v1-scope.md). **lead-gen** remains next up after
+this per the build order in [context/project-overview.md](project-overview.md).
 
 ## Goals
 
-- (none yet — filled in once the lead-gen spec is written)
+- `offer_agent` uses `WebSearchTool` for real web-grounded niche research instead of a hardcoded
+  mock dataset.
+- No real API/network calls added to the default `pytest`/CI suite.
 
 ## Notes
 
