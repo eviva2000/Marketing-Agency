@@ -1,9 +1,9 @@
-# Current Feature: lead-gen
+# Current Feature: outbound
 
 ## Active Spec
 
-None in progress. [Lead Gen](features/lead-gen.md) just completed; next up per the roadmap in
-[context/project-overview.md](project-overview.md) is `outbound`.
+[Outbound](features/outbound.md) — implemented in the CLI and verified with a focused live run.
+The full Offer → Lead Gen → Outbound smoke check remains before marking the module complete.
 
 ## Notes
 

@@ -1,4 +1,4 @@
-"""Interactive CLI chat loop for the Offer Creation Bot."""
+"""Interactive CLI chat loop for the agency pipeline."""
 
 import json
 import re
@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from agency.agents.offer_agent import offer_agent
 from agency.observability import configure_tracing, run_config
-from agency.schemas import LeadList, OfferPackage
+from agency.schemas import LeadList, OfferPackage, OutboundPackage
 
 load_dotenv()
 configure_tracing()
@@ -46,7 +46,7 @@ def _print_trace_items(new_items: list) -> None:
 
 
 def _print_final_output(final_output) -> None:
-    if isinstance(final_output, (OfferPackage, LeadList)):
+    if isinstance(final_output, (OfferPackage, LeadList, OutboundPackage)):
         print(json.dumps(final_output.model_dump(), indent=2))
     else:
         print(_highlight_viability(str(final_output)))
@@ -57,13 +57,14 @@ def main() -> None:
     current_agent = offer_agent
 
     print("=" * 70)
-    print("Offer Creation Bot")
+    print("Agency Builder")
     print("=" * 70)
     print(
         "This bot helps you decide WHAT to sell and to WHOM for your marketing\n"
         "agency. Tell it your target industry or experience, and it will search\n"
         "the web for promising niches, recommend one with real data behind it,\n"
-        "and (once you confirm) produce a structured offer package.\n"
+        "and (once you confirm) produce a structured offer package. You can then\n"
+        "find leads and draft outreach for them in the same conversation.\n"
     )
     print("Type 'exit' or 'quit' to leave at any time.\n")
     print("To get started, tell the bot about your industry/background, e.g.:")
@@ -79,7 +80,7 @@ def main() -> None:
             current_agent,
             user_input,
             session=session,
-            run_config=run_config("Offer Stage", SESSION_ID),
+            run_config=run_config("Agency Pipeline", SESSION_ID),
         )
         current_agent = result.last_agent
 

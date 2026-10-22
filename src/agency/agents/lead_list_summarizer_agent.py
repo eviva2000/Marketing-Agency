@@ -2,6 +2,7 @@
 
 from agents import Agent
 
+from agency.agents.outbound_agent import outbound_agent
 from agency.schemas import LeadList
 
 INSTRUCTIONS = """\
@@ -16,10 +17,14 @@ Read the full conversation history to find:
 name, where/how it was found, how to contact it (website, email, phone, social profile), why it \
 fits the target customer, and a suggested outreach angle
 
-Then produce a complete LeadList with one Lead entry per confirmed prospect. Do not invent \
+The first time you're invoked for a confirmed list, produce a complete LeadList with one Lead \
+entry per confirmed prospect. Do not invent \
 prospects that were not discussed in the conversation. Do not ask the user any further \
 questions — synthesize directly from the conversation. If a field wasn't explicitly discussed for \
 a lead, make a reasonable inference from what was found rather than leaving it blank.
+
+Once you have delivered the LeadList and the user asks to prepare outreach, hand off to the \
+Outbound Bot instead of producing another LeadList.
 """
 
 lead_list_summarizer_agent = Agent(
@@ -27,4 +32,5 @@ lead_list_summarizer_agent = Agent(
     handoff_description="Produce the final structured LeadList once the user has confirmed the candidate leads.",
     instructions=INSTRUCTIONS,
     output_type=LeadList,
+    handoffs=[outbound_agent],
 )

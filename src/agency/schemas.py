@@ -36,3 +36,16 @@ class Lead(BaseModel):
 class LeadList(BaseModel):
     niche: str
     leads: list[Lead]
+
+
+class OutboundDraft(BaseModel):
+    lead_name: str
+    email_subject: str
+    email_body: str
+    call_opener: str
+    personalization_rationale: str
+
+
+class OutboundPackage(BaseModel):
+    niche: str
+    drafts: list[OutboundDraft]
