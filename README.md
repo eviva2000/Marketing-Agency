@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/eviva2000/Marketing-Agency/actions/workflows/ci.yml/badge.svg)](https://github.com/eviva2000/Marketing-Agency/actions/workflows/ci.yml)
 
-A small Offer Creation Bot built on the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/),
+A small agentic marketing agency built on the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/),
 used as a hands-on introduction to tool calling, structured outputs, and multi-agent handoffs.
 
 ## What it does
@@ -12,9 +12,15 @@ used as a hands-on introduction to tool calling, structured outputs, and multi-a
    opinionated recommendation grounded in what it finds.
 2. Once you confirm a niche, it **hands off** to the **Offer Summarizer** agent, which reads the
    conversation and returns a structured `OfferPackage` (offer summary + ready-to-use pitch copy).
+3. If you then ask it to find leads, the **same Offer Summarizer** hands off to the **Lead Gen
+   Bot**, which uses `WebSearchTool` to find real, named candidate prospects matching the offer's
+   target customer.
+4. Once you confirm the list, it **hands off** to the **Lead List Summarizer**, which returns a
+   structured `LeadList` (one entry per confirmed prospect, with contact info and an outreach
+   angle).
 
 `WebSearchTool` is a hosted tool that requires a real `OPENAI_API_KEY` (OpenAI Responses API) —
-there is no API-key-free mock mode for the Offer stage anymore.
+there is no API-key-free mock mode for the Offer or Lead Gen stages.
 
 ## Setup
 
@@ -64,9 +70,11 @@ AGENCY_TRACE_CONSOLE=1 python -m agency.cli
 
 ## Project layout
 
-- `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`)
+- `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`, `LeadList`)
 - `src/agency/agents/offer_agent.py` — conversational agent with `WebSearchTool` + handoff
-- `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, handoff target
+- `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, hands off to Lead Gen
+- `src/agency/agents/lead_gen_agent.py` — conversational agent with `WebSearchTool` + handoff
+- `src/agency/agents/lead_list_summarizer_agent.py` — structured-output agent, handoff target
 - `src/agency/observability.py` — tracing setup (console export toggle, `RunConfig` tagging)
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
 - `context/` — planning/context docs: project overview, coding standards, how an agent should

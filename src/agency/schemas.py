@@ -23,3 +23,16 @@ class OfferPackage(BaseModel):
     niche: str
     offer_summary: OfferSummary
     final_pitch: FinalPitch
+
+
+class Lead(BaseModel):
+    name: str
+    how_found: str
+    contact_info: str
+    fit_reasoning: str
+    outreach_angle: str
+
+
+class LeadList(BaseModel):
+    niche: str
+    leads: list[Lead]

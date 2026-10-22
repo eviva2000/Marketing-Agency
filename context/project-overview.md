@@ -15,17 +15,23 @@ now being leveled up into a resume-ready showcase of agentic-systems engineering
 2. Once the user confirms a niche, it **hands off** to the **Offer Summarizer** agent, which reads
    the conversation and returns a structured `OfferPackage` (offer summary + ready-to-use pitch
    copy).
-3. Everything runs through a CLI chat loop (`python -m agency.cli`); no web UI yet.
+3. If the user then asks to find leads, the same Offer Summarizer **hands off** to the **Lead Gen
+   Bot**, which uses `WebSearchTool` to find real, named candidate prospects matching the offer's
+   target customer; once confirmed, it hands off to the **Lead List Summarizer**, which returns a
+   structured `LeadList`.
+4. Everything runs through a CLI chat loop (`python -m agency.cli`); no web UI yet.
 
-`WebSearchTool` is a hosted tool (OpenAI Responses API) — the Offer stage requires a real
-`OPENAI_API_KEY` for any run, per the Update note in
+`WebSearchTool` is a hosted tool (OpenAI Responses API) — the Offer and Lead Gen stages require a
+real `OPENAI_API_KEY` for any run, per the Update note in
 [ADR-003](../docs/decisions/ADR-003-v1-scope.md).
 
 ## Where things live
 
-- `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`)
+- `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`, `LeadList`)
 - `src/agency/agents/offer_agent.py` — conversational agent with `WebSearchTool` + handoff
-- `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, handoff target
+- `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, hands off to Lead Gen
+- `src/agency/agents/lead_gen_agent.py` — conversational agent with `WebSearchTool` + handoff
+- `src/agency/agents/lead_list_summarizer_agent.py` — structured-output agent, handoff target
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
 - `tests/` — unit + agent-behavior tests (fake `Model`, zero real API calls)
 - `docs/decisions/` — ADRs: the *why* behind significant, hard-to-reverse choices
@@ -42,7 +48,7 @@ Built incrementally, one module at a time, to keep each hands-on learning step i
 |---|---|---|---|
 | testing-ci | Test framework + CI pipeline (applies to the existing Offer stage too) | — | Completed |
 | observability | SDK tracing/observability setup | — | Completed |
-| lead-gen | Lead Gen agent: finds/qualifies candidate leads via web search, hands off from Offer | testing-ci, observability | Not started |
+| lead-gen | Lead Gen agent: finds/qualifies candidate leads via web search, hands off from Offer | testing-ci, observability | Completed |
 | outbound | Outbound agent: generates dry-run emails/call scripts/sequences (never dispatched), hands off from Lead Gen | lead-gen | Not started |
 | web-ui | Local web chat UI running the full Offer→Lead Gen→Outbound session (replaces/wraps the CLI) | lead-gen, outbound | Not started |
 | qualify-sales-roadmap | Docs-only: architecture/roadmap for Qualify and Sales stages (not implemented) | lead-gen, outbound | Not started |

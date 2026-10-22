@@ -1,14 +1,9 @@
-# Current Feature: None (next: Lead Gen)
+# Current Feature: lead-gen
 
 ## Active Spec
 
-None in progress. Next up per the build order in
-[context/project-overview.md](project-overview.md): **lead-gen** (Lead Gen agent) — no spec
-written yet.
-
-## Goals
-
-- (none yet — filled in once the lead-gen spec is written)
+None in progress. [Lead Gen](features/lead-gen.md) just completed; next up per the roadmap in
+[context/project-overview.md](project-overview.md) is `outbound`.
 
 ## Notes
 
@@ -29,4 +24,8 @@ written yet.
 - [Web Search Grounding](features/web-search-grounding.md) — replaced the Offer stage's mocked
   `list_candidate_niches`/`get_niche_benchmarks` tools with the Agents SDK's `WebSearchTool`;
   Offer stage now requires a real `OPENAI_API_KEY` for any run (Completed).
+- [Lead Gen](features/lead-gen.md) — `lead_gen_agent` (`WebSearchTool`, conversational) and
+  `lead_list_summarizer_agent` (`output_type=LeadList`), chained from `offer_summarizer_agent` via
+  a handoff that coexists with its `output_type=OfferPackage`; manually smoke-tested end to end
+  with a real `OPENAI_API_KEY` (Completed).
 

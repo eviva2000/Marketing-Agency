@@ -1,6 +1,7 @@
 """Interactive CLI chat loop for the Offer Creation Bot."""
 
 import json
+import re
 
 from agents import Runner, SQLiteSession
 from agents.items import HandoffOutputItem, ToolCallItem, ToolCallOutputItem
@@ -8,12 +9,27 @@ from dotenv import load_dotenv
 
 from agency.agents.offer_agent import offer_agent
 from agency.observability import configure_tracing, run_config
-from agency.schemas import OfferPackage
+from agency.schemas import LeadList, OfferPackage
 
 load_dotenv()
 configure_tracing()
 
 SESSION_ID = "offer-bot-cli"
+
+_RED = "\033[91m"
+_GREEN = "\033[92m"
+_RESET = "\033[0m"
+_VIABILITY_PATTERN = re.compile(r"\bUNVIABLE\b|\bVIABLE\b")
+
+
+def _highlight_viability(text: str) -> str:
+    """Color VIABLE green and UNVIABLE red for terminal readability."""
+
+    def _colorize(match: re.Match) -> str:
+        color = _RED if match.group() == "UNVIABLE" else _GREEN
+        return f"{color}{match.group()}{_RESET}"
+
+    return _VIABILITY_PATTERN.sub(_colorize, text)
 
 
 def _print_trace_items(new_items: list) -> None:
@@ -30,17 +46,28 @@ def _print_trace_items(new_items: list) -> None:
 
 
 def _print_final_output(final_output) -> None:
-    if isinstance(final_output, OfferPackage):
+    if isinstance(final_output, (OfferPackage, LeadList)):
         print(json.dumps(final_output.model_dump(), indent=2))
     else:
-        print(final_output)
+        print(_highlight_viability(str(final_output)))
 
 
 def main() -> None:
     session = SQLiteSession(session_id=SESSION_ID)
     current_agent = offer_agent
 
-    print("Offer Creation Bot (type 'exit' to quit)\n")
+    print("=" * 70)
+    print("Offer Creation Bot")
+    print("=" * 70)
+    print(
+        "This bot helps you decide WHAT to sell and to WHOM for your marketing\n"
+        "agency. Tell it your target industry or experience, and it will search\n"
+        "the web for promising niches, recommend one with real data behind it,\n"
+        "and (once you confirm) produce a structured offer package.\n"
+    )
+    print("Type 'exit' or 'quit' to leave at any time.\n")
+    print("To get started, tell the bot about your industry/background, e.g.:")
+    print('  "I have a background in real estate photography"\n')
     while True:
         user_input = input("You: ").strip()
         if user_input.lower() in {"exit", "quit"}:
