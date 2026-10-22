@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from agency.schemas import FinalPitch, OfferPackage, OfferSummary
+from agency.schemas import FinalPitch, Lead, LeadList, OfferPackage, OfferSummary
 
 
 def _offer_summary() -> OfferSummary:
@@ -41,3 +41,26 @@ def test_offer_package_builds_with_all_required_fields():
 def test_offer_package_requires_offer_summary_and_final_pitch():
     with pytest.raises(ValidationError):
         OfferPackage(niche="Roofing")
+
+
+def _lead() -> Lead:
+    return Lead(
+        name="Acme Roofing Co.",
+        how_found="Found via Google search for 'roofing companies in Austin, TX'",
+        contact_info="https://acmeroofing.example/contact",
+        fit_reasoning="Does $1M+/year in revenue and relies on shared leads today",
+        outreach_angle="Offer a free trial batch of exclusive leads",
+    )
+
+
+def test_lead_list_builds_with_all_required_fields():
+    lead_list = LeadList(niche="Roofing", leads=[_lead(), _lead()])
+
+    assert lead_list.niche == "Roofing"
+    assert len(lead_list.leads) == 2
+    assert lead_list.leads[0].name == "Acme Roofing Co."
+
+
+def test_lead_list_requires_niche_and_leads():
+    with pytest.raises(ValidationError):
+        LeadList(niche="Roofing")
