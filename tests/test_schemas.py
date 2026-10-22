@@ -3,7 +3,15 @@
 import pytest
 from pydantic import ValidationError
 
-from agency.schemas import FinalPitch, Lead, LeadList, OfferPackage, OfferSummary
+from agency.schemas import (
+    FinalPitch,
+    Lead,
+    LeadList,
+    OfferPackage,
+    OfferSummary,
+    OutboundDraft,
+    OutboundPackage,
+)
 
 
 def _offer_summary() -> OfferSummary:
@@ -64,3 +72,22 @@ def test_lead_list_builds_with_all_required_fields():
 def test_lead_list_requires_niche_and_leads():
     with pytest.raises(ValidationError):
         LeadList(niche="Roofing")
+
+
+def test_outbound_package_preserves_lead_and_draft_fields():
+    draft = OutboundDraft(
+        lead_name="Acme Roofing Co.",
+        email_subject="Exclusive roofing leads in Austin",
+        email_body="I noticed Acme serves Austin. We help roofers get qualified leads.",
+        call_opener="Hi, I have an idea for Acme's Austin lead pipeline.",
+        personalization_rationale="Uses Acme's location and the confirmed offer.",
+    )
+    package = OutboundPackage(niche="Roofing", drafts=[draft])
+
+    assert package.drafts[0].lead_name == "Acme Roofing Co."
+    assert package.drafts[0].email_subject == "Exclusive roofing leads in Austin"
+
+
+def test_outbound_draft_requires_both_channels():
+    with pytest.raises(ValidationError):
+        OutboundDraft(lead_name="Acme Roofing Co.", email_body="Hello")

@@ -20,6 +20,9 @@ now being leveled up into a resume-ready showcase of agentic-systems engineering
    target customer; once confirmed, it hands off to the **Lead List Summarizer**, which returns a
    structured `LeadList`.
 4. Everything runs through a CLI chat loop (`python -m agency.cli`); no web UI yet.
+   The user can ask the **Lead List Summarizer** to hand off to the **Outbound Bot**, which drafts
+   an email and call opener for each confirmed lead. After review, the **Outbound Summarizer**
+   returns a structured `OutboundPackage`; no outreach is sent.
 
 `WebSearchTool` is a hosted tool (OpenAI Responses API) — the Offer and Lead Gen stages require a
 real `OPENAI_API_KEY` for any run, per the Update note in
@@ -27,11 +30,13 @@ real `OPENAI_API_KEY` for any run, per the Update note in
 
 ## Where things live
 
-- `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`, `LeadList`)
+- `src/agency/schemas.py` — Pydantic models for `OfferPackage`, `LeadList`, `OutboundPackage`
 - `src/agency/agents/offer_agent.py` — conversational agent with `WebSearchTool` + handoff
 - `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, hands off to Lead Gen
 - `src/agency/agents/lead_gen_agent.py` — conversational agent with `WebSearchTool` + handoff
 - `src/agency/agents/lead_list_summarizer_agent.py` — structured-output agent, handoff target
+- `src/agency/agents/outbound_agent.py` — conversational outreach drafting and review
+- `src/agency/agents/outbound_summarizer_agent.py` — structured approved outreach
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
 - `tests/` — unit + agent-behavior tests (fake `Model`, zero real API calls)
 - `docs/decisions/` — ADRs: the *why* behind significant, hard-to-reverse choices
@@ -49,7 +54,7 @@ Built incrementally, one module at a time, to keep each hands-on learning step i
 | testing-ci | Test framework + CI pipeline (applies to the existing Offer stage too) | — | Completed |
 | observability | SDK tracing/observability setup | — | Completed |
 | lead-gen | Lead Gen agent: finds/qualifies candidate leads via web search, hands off from Offer | testing-ci, observability | Completed |
-| outbound | Outbound agent: generates dry-run emails/call scripts/sequences (never dispatched), hands off from Lead Gen | lead-gen | Not started |
+| outbound | Outbound agent: generates reviewed email/call drafts (never dispatched), hands off from Lead Gen | lead-gen | Implemented; manual smoke check pending |
 | web-ui | Local web chat UI running the full Offer→Lead Gen→Outbound session (replaces/wraps the CLI) | lead-gen, outbound | Not started |
 | qualify-sales-roadmap | Docs-only: architecture/roadmap for Qualify and Sales stages (not implemented) | lead-gen, outbound | Not started |
 

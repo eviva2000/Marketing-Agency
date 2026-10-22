@@ -18,6 +18,9 @@ used as a hands-on introduction to tool calling, structured outputs, and multi-a
 4. Once you confirm the list, it **hands off** to the **Lead List Summarizer**, which returns a
    structured `LeadList` (one entry per confirmed prospect, with contact info and an outreach
    angle).
+5. Ask for outreach drafts and the **Outbound Bot** prepares a personalized email and call opener
+   per confirmed lead. After review and approval, the **Outbound Summarizer** returns a structured
+   `OutboundPackage`. The drafts are never sent.
 
 `WebSearchTool` is a hosted tool that requires a real `OPENAI_API_KEY` (OpenAI Responses API) —
 there is no API-key-free mock mode for the Offer or Lead Gen stages.
@@ -51,12 +54,12 @@ source .venv/bin/activate
 python -m agency.cli
 ```
 
-Try: "I run a marketing agency focused on home services" → confirm the recommended niche → watch
-it hand off and print the structured `OfferPackage` JSON.
+Try: "I run a marketing agency focused on home services" → confirm the recommended niche → ask
+for leads → confirm the list → ask for outreach drafts → review and approve the drafts.
 
 ## Tracing
 
-Every CLI run is tagged with a `workflow_name` ("Offer Stage") and a `group_id` (the CLI session
+Every CLI run is tagged with a `workflow_name` ("Agency Pipeline") and a `group_id` (the CLI session
 id), so all turns of one conversation link into a single traced group.
 
 - **Default:** traces export to the [OpenAI dashboard](https://platform.openai.com/traces)
@@ -70,11 +73,13 @@ AGENCY_TRACE_CONSOLE=1 python -m agency.cli
 
 ## Project layout
 
-- `src/agency/schemas.py` — Pydantic models for the structured output (`OfferPackage`, `LeadList`)
+- `src/agency/schemas.py` — Pydantic models for `OfferPackage`, `LeadList`, and `OutboundPackage`
 - `src/agency/agents/offer_agent.py` — conversational agent with `WebSearchTool` + handoff
 - `src/agency/agents/offer_summarizer_agent.py` — structured-output agent, hands off to Lead Gen
 - `src/agency/agents/lead_gen_agent.py` — conversational agent with `WebSearchTool` + handoff
 - `src/agency/agents/lead_list_summarizer_agent.py` — structured-output agent, handoff target
+- `src/agency/agents/outbound_agent.py` — conversational outreach drafting and review
+- `src/agency/agents/outbound_summarizer_agent.py` — structured approved drafts
 - `src/agency/observability.py` — tracing setup (console export toggle, `RunConfig` tagging)
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
 - `context/` — planning/context docs: project overview, coding standards, how an agent should
@@ -91,5 +96,6 @@ Significant design choices and their alternatives are recorded in [docs/decision
 
 ## Next steps (not built yet)
 
-- Additional stage agents (Lead Gen, Outbound, Qualify, Sales)
+- Qualify and Sales architecture roadmap
+- Local web chat UI for the complete pipeline
 - Input guardrails and persisted sessions across separate CLI runs
