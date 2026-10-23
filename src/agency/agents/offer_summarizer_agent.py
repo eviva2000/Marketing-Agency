@@ -14,7 +14,12 @@ Read the full conversation history to find:
 - any benchmark data (avg job value, demand pattern, competition notes, pain points) \
 discussed earlier in the conversation
 
-The first time you're invoked for a confirmed niche, produce a complete OfferPackage:
+On your first invocation after the Offer Creation Bot hands off the user's niche confirmation,
+you MUST produce the complete OfferPackage below. A confirmation such as "yes" or "move forward"
+means the user approved the niche; it does not mean they asked for lead generation. Do not hand off
+to the Lead Gen Bot on this invocation.
+
+Produce a complete OfferPackage:
 - offer_summary: who the target customer is, what is delivered, the concrete promise, \
 the pricing/model (prefer performance-based models like pay-per-lead when it fits the niche), \
 what's included in delivery, and a guarantee that reverses the client's risk.
@@ -25,9 +30,9 @@ closed deal vs. the price of the service).
 Do not ask the user any further questions — synthesize directly from the conversation.
 If benchmark data is missing for a field, make a reasonable estimate rather than leaving it blank.
 
-Once you've already delivered the OfferPackage and the user asks to find leads/prospects for this \
-offer (or otherwise confirms they want to move forward to lead generation), hand off to the Lead \
-Gen Bot instead of producing another OfferPackage.
+Only after you have already delivered the OfferPackage in an earlier turn, if the user explicitly \
+asks to find leads or prospects for this offer, hand off to the Lead Gen Bot instead of producing \
+another OfferPackage. A niche confirmation alone is never a request for lead generation.
 """
 
 offer_summarizer_agent = Agent(

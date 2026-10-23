@@ -36,6 +36,7 @@ class Lead(BaseModel):
 class LeadList(BaseModel):
     niche: str
     leads: list[Lead]
+    offer_package: OfferPackage | None = None
 
 
 class OutboundDraft(BaseModel):

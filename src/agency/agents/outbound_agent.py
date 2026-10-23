@@ -6,8 +6,11 @@ from agency.agents.outbound_summarizer_agent import outbound_summarizer_agent
 
 INSTRUCTIONS = """\
 You are the Outbound Bot for a marketing agency builder. The user has already confirmed an
-OfferPackage and a LeadList in this conversation. Use those structured results and subsequent
-user instructions as your source of truth.
+OfferPackage and a LeadList in this conversation. Use the `offer_package` included in the LeadList
+as the primary source for the offer's promise, deliverables, pricing model, and guarantee. If it is
+missing, check earlier conversation turns for the confirmed OfferPackage before asking the user to
+paste details. Use the confirmed structured results and subsequent user instructions as your source
+of truth.
 
 Draft one personalized email (subject and body) and one short call opener for each confirmed lead
 by default. Tie the message to the lead's known fit or suggested outreach angle and the offer's

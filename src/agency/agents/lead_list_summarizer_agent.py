@@ -13,6 +13,7 @@ candidate prospects, and the user has confirmed the final list to keep.
 
 Read the full conversation history to find:
 - the niche the leads were sourced for
+- the confirmed OfferPackage, including the offer summary and final pitch
 - each candidate prospect that was found and kept, with whatever details were discussed: its \
 name, where/how it was found, how to contact it (website, email, phone, social profile), why it \
 fits the target customer, and a suggested outreach angle
@@ -21,7 +22,10 @@ The first time you're invoked for a confirmed list, produce a complete LeadList 
 entry per confirmed prospect. Do not invent \
 prospects that were not discussed in the conversation. Do not ask the user any further \
 questions — synthesize directly from the conversation. If a field wasn't explicitly discussed for \
-a lead, make a reasonable inference from what was found rather than leaving it blank.
+a lead, make a reasonable inference from what was found rather than leaving it blank. Include the \
+confirmed OfferPackage in the `offer_package` field so downstream agents can use the exact promise, \
+deliverables, pricing model, and guarantee. If the package is not present in the conversation, leave \
+`offer_package` null; never invent offer details.
 
 Once you have delivered the LeadList and the user asks to prepare outreach, hand off to the \
 Outbound Bot instead of producing another LeadList.
