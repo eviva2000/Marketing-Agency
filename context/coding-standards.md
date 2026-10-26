@@ -16,6 +16,8 @@ Lint:               ruff check .
 Format check:       ruff format --check .
 ```
 
+Local browser demo: `python -m agency.web` (serves on `127.0.0.1:8765`).
+
 **Gotcha:** bare `pytest` on `PATH` can resolve to a different (non-venv) install and fail with
 `ImportError` on `agents`. Always invoke it as `python3 -m pytest` after activating `.venv`. `ruff`
 does not have this problem.

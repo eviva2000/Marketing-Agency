@@ -54,6 +54,17 @@ source .venv/bin/activate
 python -m agency.cli
 ```
 
+To use the local browser interface instead:
+
+```bash
+source .venv/bin/activate
+python -m agency.web
+```
+
+Then open <http://127.0.0.1:8765>. The web interface keeps sessions in memory and requires the
+same `OPENAI_API_KEY` as the CLI. It binds to loopback; messages and web searches use OpenAI
+services, and outreach drafts are never sent.
+
 Try: "I run a marketing agency focused on home services" → confirm the recommended niche → ask
 for leads → confirm the list → ask for outreach drafts → review and approve the drafts.
 
@@ -82,6 +93,7 @@ AGENCY_TRACE_CONSOLE=1 python -m agency.cli
 - `src/agency/agents/outbound_summarizer_agent.py` — structured approved drafts
 - `src/agency/observability.py` — tracing setup (console export toggle, `RunConfig` tagging)
 - `src/agency/cli.py` — interactive chat loop, prints tool calls/handoffs for visibility
+- `src/agency/web.py` and `src/agency/web_ui/` — local HTTP server and browser chat interface
 - `context/` — planning/context docs: project overview, coding standards, how an agent should
   operate in this repo, and the current/completed feature log (start at
   [context/project-overview.md](context/project-overview.md))
@@ -97,5 +109,4 @@ Significant design choices and their alternatives are recorded in [docs/decision
 ## Next steps (not built yet)
 
 - Qualify and Sales architecture roadmap
-- Local web chat UI for the complete pipeline
 - Input guardrails and persisted sessions across separate CLI runs

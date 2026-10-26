@@ -1,9 +1,9 @@
-# Current Feature: outbound
+# Current Feature: web-ui
 
 ## Active Spec
 
-[Outbound](features/outbound.md) — implemented in the CLI and verified with a focused live run.
-The full Offer → Lead Gen → Outbound smoke check remains before marking the module complete.
+[Web UI](features/web-ui.md) — local browser interface for the complete Offer → Lead Gen →
+Outbound session; implemented, with browser smoke check pending.
 
 ## Notes
 
@@ -28,4 +28,7 @@ The full Offer → Lead Gen → Outbound smoke check remains before marking the 
   `lead_list_summarizer_agent` (`output_type=LeadList`), chained from `offer_summarizer_agent` via
   a handoff that coexists with its `output_type=OfferPackage`; manually smoke-tested end to end
   with a real `OPENAI_API_KEY` (Completed).
+- [Outbound](features/outbound.md) — Outbound drafting and structured summarization are chained
+  from the confirmed lead list in the CLI; full Offer → Lead Gen → Outbound smoke check completed
+  through draft approval. Outreach is never sent (Completed).
 

@@ -1,7 +1,7 @@
 # Feature: outbound
 
 ## Status
-Implemented; manual smoke check pending
+Completed
 
 ## Objective
 
@@ -83,12 +83,12 @@ follow-up scheduling, tracking opens/replies, and building the web UI (a later r
 
 - [x] Task 10: Update README and `context/project-overview.md` to describe the implemented Outbound
       stage and revise roadmap status.
-- [ ] Task 11: With a real `OPENAI_API_KEY`, manually run Offer → Lead Gen → Outbound and verify
+- [x] Task 11: With a real `OPENAI_API_KEY`, manually run Offer → Lead Gen → Outbound and verify
       the drafts match the confirmed offer and leads. Confirm that no sending mechanism exists.
-      A focused live Outbound run with one supplied offer and lead passed: the agent drafted an
-      email and call opener, then returned one structured draft after approval. The full pipeline
-      run remains to be checked.
-- [ ] Task 12: Move this entry to completed history in `context/current-feature.md` after the
+      The focused live Outbound run passed, and a full CLI run reached the structured offer and
+      lead list, handed off to Outbound, and completed the approval step. No sending mechanism
+      exists.
+- [x] Task 12: Move this entry to completed history in `context/current-feature.md` after the
       checkpoint passes.
 
 ## Checkpoint
@@ -99,6 +99,7 @@ follow-up scheduling, tracking opens/replies, and building the web UI (a later r
 - [x] The structured output associates each draft with a confirmed lead name.
 - [x] The focused live draft used only the supplied offer and lead details.
 - [x] The focused live run returned structured output only after approval.
+- [x] The full Offer → Lead Gen → Outbound CLI smoke check completed through draft approval.
 - [x] No email, call, or other outreach is dispatched.
 - [x] README and project overview describe the implemented stage.
 
