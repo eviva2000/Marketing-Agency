@@ -19,6 +19,9 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+agency = ["web_ui/*.html", "web_ui/*.js", "web_ui/*.css"]
+
 [tool.ruff]
 target-version = "py310"
 line-length = 110
