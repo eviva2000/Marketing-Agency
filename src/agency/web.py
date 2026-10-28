@@ -1,5 +1,6 @@
 """Local browser interface for the Offer to Lead Gen to Outbound pipeline."""
 
+import asyncio
 import json
 import logging
 import secrets
@@ -25,6 +26,51 @@ WEB_ASSETS = Path(__file__).parent / "web_ui"
 logger = logging.getLogger(__name__)
 
 
+class _AgentRuntime:
+    """Runs all agent calls on one event loop so the shared async client stays loop-bound."""
+
+    def __init__(self) -> None:
+        self._ready = threading.Event()
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._thread = threading.Thread(target=self._serve, name="agency-agent-loop", daemon=True)
+        self._thread.start()
+        self._ready.wait()
+
+    def _serve(self) -> None:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        self._loop = loop
+        self._ready.set()
+        loop.run_forever()
+
+    def run(self, agent: Agent, message: str, session: SQLiteSession, group_id: str) -> object:
+        if self._loop is None:
+            raise RuntimeError("Agent event loop did not start.")
+
+        async def run_agent() -> object:
+            return await Runner.run(
+                agent,
+                message,
+                session=session,
+                run_config=run_config("Agency Pipeline Web UI", group_id),
+            )
+
+        future = asyncio.run_coroutine_threadsafe(run_agent(), self._loop)
+        return future.result()
+
+
+_agent_runtime: _AgentRuntime | None = None
+_agent_runtime_lock = threading.Lock()
+
+
+def _get_agent_runtime() -> _AgentRuntime:
+    global _agent_runtime
+    with _agent_runtime_lock:
+        if _agent_runtime is None:
+            _agent_runtime = _AgentRuntime()
+        return _agent_runtime
+
+
 class SessionNotFoundError(Exception):
     """Raised when a request references a conversation that is no longer active."""
 
@@ -39,12 +85,7 @@ class _Conversation:
 
 
 def _run_agent_turn(agent: Agent, message: str, session: SQLiteSession, group_id: str) -> object:
-    return Runner.run_sync(
-        agent,
-        message,
-        session=session,
-        run_config=run_config("Agency Pipeline Web UI", group_id),
-    )
+    return _get_agent_runtime().run(agent, message, session, group_id)
 
 
 def _safe_activity(items: list) -> list[dict[str, str]]:
@@ -104,7 +145,12 @@ class ConversationManager:
             )
             conversation.current_agent = result.last_agent
             reply, structured = _serialize_output(result.final_output)
-            return {"reply": reply, "structured": structured, "activity": _safe_activity(result.new_items)}
+            return {
+                "reply": reply,
+                "structured": structured,
+                "activity": _safe_activity(result.new_items),
+                "agent": conversation.current_agent.name,
+            }
 
     def reset(self, session_id: str) -> None:
         with self._lock:
@@ -177,7 +223,12 @@ def create_server(host: str = "127.0.0.1", port: int = 8765) -> ThreadingHTTPSer
                     logger.exception("Browser conversation turn failed")
                     self._send_json(
                         HTTPStatus.BAD_GATEWAY,
-                        {"error": "The response failed. Your conversation is available to retry."},
+                        {
+                            "error": (
+                                "The assistant request failed. Check the server terminal for details, "
+                                "then retry your answer."
+                            )
+                        },
                     )
                 else:
                     self._send_json(HTTPStatus.OK, response)

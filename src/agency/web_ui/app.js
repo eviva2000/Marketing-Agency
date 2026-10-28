@@ -40,6 +40,124 @@ function addActivity(items) {
   return list;
 }
 
+function appendInlineMarkdown(parent, text) {
+  const pattern = /\*\*([^*]+)\*\*|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+  let cursor = 0;
+  for (const match of text.matchAll(pattern)) {
+    parent.append(document.createTextNode(text.slice(cursor, match.index)));
+    if (match[1]) {
+      const strong = element("strong", "", match[1]);
+      parent.append(strong);
+    } else {
+      const link = element("a", "", match[2]);
+      link.href = match[3];
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      parent.append(link);
+    }
+    cursor = match.index + match[0].length;
+  }
+  parent.append(document.createTextNode(text.slice(cursor)));
+}
+
+function tableCells(line) {
+  const escapedPipe = "\u0000";
+  let normalized = line.trim().replaceAll("\\|", escapedPipe);
+  if (normalized.startsWith("|")) normalized = normalized.slice(1);
+  if (normalized.endsWith("|")) normalized = normalized.slice(0, -1);
+  return normalized.split("|").map((cell) => cell.replaceAll(escapedPipe, "|").trim());
+}
+
+function isTableSeparator(line) {
+  const cells = tableCells(line);
+  return cells.length > 1 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function appendTable(parent, headerLine, rows) {
+  const wrapper = element("div", "table-scroll");
+  const table = element("table", "reply-table");
+  const head = element("thead");
+  const header = element("tr");
+  tableCells(headerLine).forEach((text) => {
+    const cell = element("th", "", text);
+    cell.scope = "col";
+    header.append(cell);
+  });
+  head.append(header);
+  table.append(head);
+
+  const body = element("tbody");
+  rows.forEach((row) => {
+    const tr = element("tr");
+    const cells = tableCells(row);
+    while (cells.length < header.children.length) cells.push("");
+    cells.slice(0, header.children.length).forEach((text) => {
+      const cell = element("td");
+      appendInlineMarkdown(cell, text);
+      tr.append(cell);
+    });
+    body.append(tr);
+  });
+  table.append(body);
+  wrapper.append(table);
+  parent.append(wrapper);
+}
+
+function appendReply(parent, text) {
+  const lines = text.split("\n");
+  let paragraph = [];
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    const node = element("p");
+    appendInlineMarkdown(node, paragraph.join("\n"));
+    const question = node.textContent.trim();
+    if (question.endsWith("?")) {
+      node.append(document.createTextNode(" "));
+      const helpButton = element("button", "help-question-button", "Help me on this");
+      helpButton.type = "button";
+      helpButton.setAttribute("aria-label", `Get help understanding: ${question}`);
+      helpButton.addEventListener("click", () => {
+        sendMessage(`Research this question using web search and answer it with current, reliable evidence and citations. Explain how the evidence applies to my selected niche, then ask me the question again so I can make my own decision. This is a request for research, not my answer: ${question}`);
+      });
+      node.append(helpButton);
+    }
+    parent.append(node);
+    paragraph = [];
+  };
+
+  for (let index = 0; index < lines.length; index += 1) {
+    if (lines[index].includes("|") && isTableSeparator(lines[index + 1] || "")) {
+      flushParagraph();
+      const headerLine = lines[index];
+      const rows = [];
+      index += 2;
+      while (index < lines.length && lines[index].includes("|")) {
+        rows.push(lines[index]);
+        index += 1;
+      }
+      appendTable(parent, headerLine, rows);
+      index -= 1;
+    } else if (lines[index].trim()) {
+      paragraph.push(lines[index]);
+    } else {
+      flushParagraph();
+    }
+  }
+  flushParagraph();
+}
+
+function nextStepPanel(description, buttonLabel, prompt) {
+  const panel = element("section", "next-step");
+  const copy = element("div");
+  copy.append(element("p", "next-step-label", "NEXT STEP"));
+  copy.append(element("p", "next-step-copy", description));
+  const button = element("button", "next-step-button", buttonLabel);
+  button.type = "button";
+  button.addEventListener("click", () => sendMessage(prompt));
+  panel.append(copy, button);
+  return panel;
+}
+
 function field(parent, label, value) {
   if (value === undefined || value === null || value === "") return;
   const heading = element("h4", "", label);
@@ -62,6 +180,11 @@ function structuredView(data) {
   const body = element("div", "structured-body");
   if (Array.isArray(data.leads)) {
     body.append(element("h3", "", `${data.niche || "Confirmed"} · ${data.leads.length} leads`));
+    body.append(nextStepPanel(
+      "Review this approved list, then create personalized outreach drafts.",
+      "Prepare outreach drafts",
+      "Prepare personalized outreach drafts for these approved leads.",
+    ));
     data.leads.forEach((lead) => {
       const record = element("section", "record");
       record.append(element("p", "record-title", lead.name || "Lead"));
@@ -85,6 +208,11 @@ function structuredView(data) {
     });
   } else if (data.offer_summary && data.final_pitch) {
     body.append(element("h3", "", data.niche || "Confirmed offer"));
+    body.append(nextStepPanel(
+      "Find prospective clients who match this offer.",
+      "Find matching leads",
+      "Find matching leads for this offer.",
+    ));
     Object.entries(data.offer_summary).forEach(([key, value]) => field(body, key.replaceAll("_", " "), value));
     const pitch = element("section", "record");
     pitch.append(element("p", "record-title", "Pitch"));
@@ -97,15 +225,20 @@ function structuredView(data) {
   return details;
 }
 
-function addAssistantMessage(reply, activity, structured) {
+function addAssistantMessage(reply, activity, structured, agentName) {
   const row = element("article", "message");
   row.append(element("div", "assistant-avatar", "A"));
   const content = element("div", "message-content");
   content.append(element("p", "message-label", "AGENCY BUILDER"));
   if (reply && reply !== "Structured result ready.") {
-    const paragraph = element("p");
-    paragraph.textContent = reply;
-    content.append(paragraph);
+    appendReply(content, reply);
+  }
+  if (agentName === "Lead Gen Bot") {
+    content.append(nextStepPanel(
+      "Review these candidates. Approve the list to keep them, or ask for changes to the location or type of business.",
+      "Approve this list",
+      "This list looks good. Please keep these leads and prepare the structured lead list.",
+    ));
   }
   const activityList = addActivity(activity);
   if (activityList) content.append(activityList);
@@ -118,9 +251,12 @@ function addAssistantMessage(reply, activity, structured) {
 
 function setBusy(value) {
   busy = value;
-  sendButton.disabled = value;
+  sendButton.disabled = value || !sessionId;
   messageInput.disabled = value;
   newChatButton.disabled = value;
+  document.querySelectorAll(".next-step-button, .help-question-button").forEach((button) => {
+    button.disabled = value;
+  });
   sendButton.querySelector("span:first-child").textContent = value ? "Working" : "Send";
   if (value) {
     const row = element("article", "message");
@@ -138,7 +274,7 @@ function setBusy(value) {
 function showNotice(text, retry = false) {
   notice.replaceChildren(document.createTextNode(text));
   if (retry) {
-    const button = element("button", "", "Retry");
+    const button = element("button", "", "Retry answer");
     button.type = "button";
     button.addEventListener("click", () => sendMessage(pendingMessage, false));
     notice.append(button);
@@ -174,7 +310,6 @@ async function startSession() {
 async function connectSession() {
   try {
     sessionId = await startSession();
-    messageInput.disabled = false;
     sendButton.disabled = false;
     clearNotice();
   } catch {
@@ -197,7 +332,7 @@ async function sendMessage(text, addBubble = true) {
       method: "POST",
       body: JSON.stringify({ session_id: sessionId, message: pendingMessage }),
     });
-    addAssistantMessage(response.reply, response.activity, response.structured);
+    addAssistantMessage(response.reply, response.activity, response.structured, response.agent);
     pendingMessage = null;
   } catch (error) {
     showNotice(error.message, true);
@@ -210,7 +345,11 @@ async function sendMessage(text, addBubble = true) {
 
 composer.addEventListener("submit", (event) => {
   event.preventDefault();
-  if (!busy) sendMessage(messageInput.value);
+  if (!busy) {
+    const text = messageInput.value;
+    const isRetry = pendingMessage && text.trim() === pendingMessage;
+    sendMessage(isRetry ? pendingMessage : text, !isRetry);
+  }
 });
 
 messageInput.addEventListener("keydown", (event) => {

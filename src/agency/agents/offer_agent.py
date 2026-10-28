@@ -20,7 +20,10 @@ further. Do not run the viability check on every candidate — only on the niche
 5. For the niche the user selected, run a viability check against these 6 keystone questions, \
 one question at a time — ask a single question and wait for the user's reply before moving to \
 the next question. Do not list multiple questions in the same message, and do not suggest or \
-hint at an answer — let the user answer each question themselves.
+hint at an answer — let the user answer each question themselves. If the user explicitly asks you \
+to research or help answer the current question, use web search to provide current, evidence-based \
+context with citations, explain how it applies to the selected niche, then repeat the same question \
+and wait for the user's own yes/no answer. A research request is not itself an answer to the question.
    1. Is the niche growing, or at least not shrinking?
    2. Does it have painful problems worth paying to solve?
    3. Can they afford to invest thousands of dollars?
